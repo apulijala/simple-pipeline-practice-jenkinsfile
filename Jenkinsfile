@@ -1,38 +1,56 @@
-pipeline {
+pipeline{
+
     agent{
-        label "Master"
+        label "jenkins-slave-ssh"
     }
-    options {
-        timestamps()
-    }
+
     stages{
-        stage("Chekcout"){
-            steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '217f477c-ae18-4d4c-bf08-de299616156b', url: 'git@github.com:apulijala/simple-pipeline-practice-jenkinsfile.git']]])
+
+        stage("Checkout Datta") {
+            steps {
+                echo "Checkout from SCM"
             }
-            
         }
 
         stage("Build") {
-            parallel {
-                stage("Test 1"){
-                    steps{
-                        echo "Running Test One"
+
+           parallel {
+
+               stage ("First Test") {
+                    steps {
+                        echo "Running test 1"
                     }
-                }
-                stage("Test 2"){
-                    steps{
-                        echo "Running Test Two"
+               }
+                
+                stage ("Second Test") {
+
+                    steps {
+                        echo "Running test 2"
                     }
-                }
-                stage("Test 3"){
-                    steps{
-                        echo "Running Test Three"
-                        python3 *test.py
+
+               }
+
+               stage ("Third Test") {
+                    
+                    steps {
+                        sh 'python3 *test.py'
                     }
-                }
-            }
+               }
+
+           } 
+
         }
+
     }
     
-} 
+    post {
+
+        success{
+            echo "========pipeline executed successfully ========"
+        }
+ 
+        failure {
+            echo "========pipeline execution failed========"
+        }
+    }
+}
